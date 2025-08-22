@@ -1,16 +1,37 @@
-import  { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import  { useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useAppContext } from '../API/AppContext';
 
 export default function GuestLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate()
+  const {connectedUser} = useAppContext()
+  const [OpenPage, SetOpenPage] = useState(false)
 
-  return (
+  useEffect(() => {
+  if (connectedUser === undefined) return;
+
+  if (connectedUser == null) {        
+    SetOpenPage(true)
+  } else if (connectedUser.role === 1 && !connectedUser.authCompleted) {
+    navigate("/seller/create");
+  } else if (connectedUser.role === 1 && connectedUser.authCompleted) {
+    navigate("/seller/home");
+} else if (connectedUser.role === 2 && !connectedUser.authCompleted) {
+      navigate("/buyer/create");
+  } else if (connectedUser.role === 2 && connectedUser.authCompleted) {
+    navigate("/buyer/home");
+  }
+}, [connectedUser, navigate]);
+
+
+  return OpenPage && (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Bar */}
+
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            {/* Logo and Brand */}
+
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <div className="h-8 w-8 bg-green-600 rounded-md"></div>
@@ -18,7 +39,6 @@ export default function GuestLayout() {
               </div>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">
                 Features
@@ -34,7 +54,6 @@ export default function GuestLayout() {
               </a>
             </div>
 
-            {/* Auth Buttons - Desktop */}
             <div className="hidden md:flex items-center space-x-4">
               <a
                 href="#"
@@ -50,7 +69,6 @@ export default function GuestLayout() {
               </a>
             </div>
 
-            {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -71,7 +89,6 @@ export default function GuestLayout() {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
@@ -110,7 +127,6 @@ export default function GuestLayout() {
         {<Outlet/>}
       </main>
 
-      {/* Footer */}
       <footer className="bg-white mt-12 border-t">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">

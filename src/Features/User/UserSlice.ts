@@ -24,6 +24,7 @@ export interface UserDTO {
     phone: string;
     role: Roles;
     photo: File;
+    authCompleted: boolean;
 }
 interface UserState {
     user: UserDTO | undefined;

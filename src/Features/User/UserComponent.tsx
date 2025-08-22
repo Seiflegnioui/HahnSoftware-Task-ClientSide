@@ -1,15 +1,27 @@
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store";
 import  { type FormEvent, useState } from "react";
 import { CreateUser } from "./UserThunk";
+import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../../API/AppContext";
 
 export default function UserRegistrationForm() {
   const dispatch = useDispatch<AppDispatch>();
+  const {connectedUser,refreshUser} = useAppContext();
+  const userState = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const NextRegister = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(CreateUser(e));
+    dispatch(CreateUser(e)).unwrap().then(()=>{
+        refreshUser();
+        if(connectedUser?.role == 1){
+            navigate("/seller/create")
+        }else if(connectedUser?.role == 2){
+            navigate("/buyer/create")
+        }
+    });
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +79,7 @@ export default function UserRegistrationForm() {
                   className="hidden" 
                   onChange={handlePhotoChange} 
                   accept="image/*"
+                  disabled={userState.loading}
                 />
               </label>
             </div>
@@ -74,11 +87,9 @@ export default function UserRegistrationForm() {
             <p className="text-xs text-gray-400 text-center">JPG, PNG or GIF. Max 5MB.</p>
           </div>
 
-          {/* Form Section */}
           <div className="md:w-2/3">
             <form className="space-y-6" onSubmit={(e) => NextRegister(e)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Email Field */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                     Email Address
@@ -94,13 +105,13 @@ export default function UserRegistrationForm() {
                       type="email"
                       id="email"
                       name="email"
-                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Enter your email"
+                      disabled={userState.loading}
                     />
                   </div>
                 </div>
 
-                {/* Username Field */}
                 <div>
                   <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
                     Username
@@ -115,13 +126,13 @@ export default function UserRegistrationForm() {
                       type="text"
                       id="username"
                       name="username"
-                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Choose a username"
+                      disabled={userState.loading}
                     />
                   </div>
                 </div>
 
-                {/* Phone Field */}
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number
@@ -136,13 +147,13 @@ export default function UserRegistrationForm() {
                       type="tel"
                       id="phone"
                       name="phone"
-                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Enter your phone number"
+                      disabled={userState.loading}
                     />
                   </div>
                 </div>
 
-                {/* Password Field */}
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                     Password
@@ -157,13 +168,13 @@ export default function UserRegistrationForm() {
                       type="password"
                       id="password"
                       name="password"
-                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Create a secure password"
+                      disabled={userState.loading}
                     />
                   </div>
                 </div>
 
-                {/* Role Selection */}
                 <div className="md:col-span-2">
                   <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
                     I want to join as a
@@ -176,10 +187,11 @@ export default function UserRegistrationForm() {
                         id="seller"
                         name="role"
                         value={1}
+                        disabled={userState.loading}
                       />
                       <label
                         htmlFor="seller"
-                        className="flex flex-col p-4 border border-gray-300 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-green-50 transition-colors"
+                        className={`flex flex-col p-4 border border-gray-300 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-green-50 transition-colors ${userState.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <span className="font-medium text-gray-900">Seller</span>
                         <span className="text-sm text-gray-500">List and sell products</span>
@@ -193,10 +205,11 @@ export default function UserRegistrationForm() {
                         name="role"
                         value={2}
                         defaultChecked
+                        disabled={userState.loading}
                       />
                       <label
                         htmlFor="buyer"
-                        className="flex flex-col p-4 border border-gray-300 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-green-50 transition-colors"
+                        className={`flex flex-col p-4 border border-gray-300 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-green-50 transition-colors ${userState.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <span className="font-medium text-gray-900">Buyer</span>
                         <span className="text-sm text-gray-500">Browse and purchase items</span>
@@ -206,12 +219,27 @@ export default function UserRegistrationForm() {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* {userState.error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  <p className="text-sm">{userState.error}</p>
+                </div>
+              )} */}
+
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-4 rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition shadow-md hover:shadow-lg"
+                disabled={userState.loading}
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-4 rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed relative"
               >
-                Create Account
+                {userState.loading ? (
+                  <>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                    </div>
+                    <span className="opacity-0">Creating Account...</span>
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </form>
 
