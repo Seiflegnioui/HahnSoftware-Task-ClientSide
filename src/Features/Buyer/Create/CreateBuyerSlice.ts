@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Sources } from "../../Seller/Create/Enums";
 import { CreateBuyer } from './CreateBuyerThunk';
+import type { UserDTO } from "../../User/UserSlice";
 
 
 export interface CreateBuyerDTO {
@@ -19,7 +20,11 @@ export interface BuyerDTO {
     mySource : Sources,
     birthDate : string,
     
-    JoinedAt : Date
+    JoinedAt : Date,
+
+    username:string,
+    email:string,
+    photo:string
 } 
 
 interface BuyerState {

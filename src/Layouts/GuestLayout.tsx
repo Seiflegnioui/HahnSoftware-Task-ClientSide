@@ -1,5 +1,5 @@
 import  { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../API/AppContext';
 
 export default function GuestLayout() {
@@ -55,18 +55,18 @@ export default function GuestLayout() {
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-              <a
-                href="#"
+              <Link
+                to="/guest/login"
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 transition-colors"
               >
                 Sign in
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/guest/user"
                 className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
               >
                 Sign up
-              </a>
+              </Link>
             </div>
 
             <div className="md:hidden flex items-center">

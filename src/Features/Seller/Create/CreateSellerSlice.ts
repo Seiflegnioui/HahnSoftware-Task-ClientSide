@@ -17,11 +17,13 @@ export interface CreateSellerDTO {
 
 } 
 
+
 export interface SellerDTO {
+    id:number,
     userId : number,
     shopName:string,
     shopLogo : string,
-    shopDescription: string,
+    shopeDescription: string,
     adress : {country:string,city:string,adress:string},
     hasLocal: boolean,
     localAdress: {country:string,city:string,adress:string},
@@ -30,6 +32,11 @@ export interface SellerDTO {
     facebook: string | null,
     instagram : string | null,
     mySource : Sources,
+    email:string,
+    rating:number,
+    username:string,
+    photo:string,
+    joinedAt:string
 } 
 
 interface SellerState {

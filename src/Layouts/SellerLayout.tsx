@@ -4,34 +4,41 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 export default function SellerLayout() {
   const navigate = useNavigate();
-  const { connectedUser } = useAppContext();
+  const { connectedUser, refreshUser } = useAppContext();
   const [OpenPage, SetOpenPage] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activePage, setActivePage] = useState('dashboard');
+  const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
 
   useEffect(() => {
-  if (connectedUser === undefined) return;
+    if (connectedUser === undefined) return;
 
-  if (connectedUser == null) {        
+    if (connectedUser == null) {        
+      navigate("/guest/user");
+    } else if (connectedUser.role === 1 && !connectedUser.authCompleted) {
+      navigate("/seller/create");
+    } else if (connectedUser.role === 1 && connectedUser.authCompleted) {
+      SetOpenPage(true)
+    } else if (connectedUser.role === 2 && !connectedUser.authCompleted) {
+        navigate("/buyer/create");
+    } else if (connectedUser.role === 2 && connectedUser.authCompleted) {
+      navigate("/buyer/home");
+    }
+  }, [connectedUser, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("TOKEN");
+    refreshUser();
     navigate("/guest/user");
-  } else if (connectedUser.role === 1 && !connectedUser.authCompleted) {
-    navigate("/seller/create");
-  } else if (connectedUser.role === 1 && connectedUser.authCompleted) {
-    SetOpenPage(true)
-  } else if (connectedUser.role === 2 && !connectedUser.authCompleted) {
-      navigate("/buyer/create");
-  } else if (connectedUser.role === 2 && connectedUser.authCompleted) {
-    navigate("/buyer/home");
-  }
-}, [connectedUser, navigate]);
-
+    setShowLogoutDropdown(false);
+  };
 
   if (!OpenPage) return null;
 
   const navigationItems = [
     { id: 'home', name: 'Home', icon: '📊', path: '/seller/home' },
     { id: 'products', name: 'Products', icon: '🛍️', path: '/seller/products' },
-    // { id: 'orders', name: 'Orders', icon: '📦', path: '/seller/products' },
+    { id: 'orders', name: 'Orders', icon: '📦', path: '/seller/orders' },
     // { id: 'analytics', name: 'Analytics', icon: '📈', path: '/seller/analytics' },
     // { id: 'customers', name: 'Customers', icon: '👥', path: '/seller/customers' },
     // { id: 'settings', name: 'Settings', icon: '⚙️', path: '/seller/settings' },
@@ -185,13 +192,29 @@ export default function SellerLayout() {
 
               <div className="relative ml-3">
                 <div className="flex items-center">
-                  <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white font-medium">
-                    {connectedUser?.username?.[0]?.toUpperCase() || 'S'}
-                  </div>
-                  <span className="ml-2 hidden text-sm font-medium text-gray-700 md:block">
-                    {connectedUser?.username || 'Seller'}
-                  </span>
+                  <button
+                    onClick={() => setShowLogoutDropdown(!showLogoutDropdown)}
+                    className="flex items-center focus:outline-none"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white font-medium">
+                      {connectedUser?.username?.[0]?.toUpperCase() || 'S'}
+                    </div>
+                    <span className="ml-2 hidden text-sm font-medium text-gray-700 md:block">
+                      {connectedUser?.username || 'Seller'}
+                    </span>
+                  </button>
                 </div>
+
+                {showLogoutDropdown && (
+                  <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

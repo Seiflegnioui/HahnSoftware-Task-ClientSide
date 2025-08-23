@@ -8,7 +8,7 @@ import { useAppContext } from "../../API/AppContext";
 export default function UserRegistrationForm() {
   const dispatch = useDispatch<AppDispatch>();
   const {connectedUser,refreshUser} = useAppContext();
-  const userState = useSelector((state: RootState) => state.user);
+  const userState = useSelector((state: RootState) => state.user.create);
   const navigate = useNavigate();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 

@@ -32,7 +32,7 @@ export default function BuyerLayout() {
     { id: 'home', name: 'home', path: '/buyer/home' },
     // { id: 'products', name: 'Products', path: '/buyer/products' },
     // { id: 'wishlist', name: 'Wishlist', path: '/buyer/wishlist' },
-    // { id: 'orders', name: 'Orders', path: '/buyer/orders' },
+    { id: 'orders', name: 'Orders', path: '/buyer/orders' },
     // { id: 'reviews', name: 'Reviews', path: '/buyer/reviews' },
   ];
 
@@ -142,7 +142,7 @@ export default function BuyerLayout() {
               {getActivePage().replace(/-/g, ' ')}
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Welcome to your buyer dashboard
+              Welcome to your home
             </p>
           </div>
 

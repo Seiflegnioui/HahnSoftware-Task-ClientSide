@@ -1,49 +1,345 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useLocation } from "react-router-dom";
+import type { RootState, AppDispatch } from "../../../store";
+import { DeleteProduct, GetProduct } from "./GetProductThunk";
+import { useAppContext } from "../../../../API/AppContext";
+import type { ProductDTO } from "..";
 
 export default function ShowProductComponent() {
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-          Products
-        </h1>
-        <div className="flex w-full md:w-auto space-x-2">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-          />
-          <Link to="/seller/product/new">
-          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-            New Product
-          </button>
+  const { connectedSellerOrBuyer } = useAppContext();
+  const location = useLocation();
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: string;
+  } | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const productState = useSelector((s: RootState) => s.product.get);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState<ProductDTO[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductDTO | null>(
+    null
+  );
+
+  useEffect(() => {
+    dispatch(GetProduct(connectedSellerOrBuyer?.id));
+    console.log();
+  }, [connectedSellerOrBuyer?.id, dispatch]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setNotification({
+        message: location.state.message,
+        type: location.state.messageType || "success",
+      });
+
+      window.history.replaceState({}, document.title);
+
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+    }
+
+    if (productState.products) {
+      const filtered = productState.products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [searchTerm, productState.products]);
+
+  const openDeleteDialog = (product: ProductDTO) => {
+    setSelectedProduct(product);
+    setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (product: ProductDTO) => {
+    setSelectedProduct(product);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    dispatch(DeleteProduct(selectedProduct!.id));
+
+    setDeleteDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleEdit = () => {
+    console.log("Editing product:", selectedProduct);
+    // Add your edit logic here
+    setEditDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  if (productState.loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  if (productState.errors.length) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mx-4 my-6">
+        <h3 className="text-red-800 font-medium">Error loading products</h3>
+        <p className="text-red-600 text-sm">{productState.errors.join(", ")}</p>
+      </div>
+    );
+  }
+
+  if (!productState.products || productState.products.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {notification && (
+          <div
+            className={`mb-4 p-3 rounded-lg ${
+              notification.type === "success"
+                ? "bg-green-100 border border-green-400 text-green-700"
+                : "bg-red-100 border border-red-400 text-red-700"
+            }`}
+          >
+            {notification.message}
+          </div>
+        )}
+
+        <div className="text-center bg-white rounded-lg shadow-sm p-8 border border-gray-100">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            No products found
+          </h2>
+          <p className="text-gray-600 mb-6">
+            You haven't added any products yet.
+          </p>
+          <Link
+            to="/seller/product/new"
+            className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+          >
+            Add Your First Product
           </Link>
         </div>
       </div>
+    );
+  }
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {/* Sample product card */}
-        {[...Array(8)].map((_, idx) => (
-          <div
-            key={idx}
-            className="bg-white rounded-2xl shadow p-4 flex flex-col items-center hover:shadow-lg transition"
-          >
-            <div className="h-40 w-full mb-4 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-lg">
-              Image
-            </div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Product Name
-            </h2>
-            <p className="text-gray-500 mb-4">$99.99</p>
-            <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-              View
-            </button>
-          </div>
-        ))}
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Products</h1>
+          <p className="text-gray-600 mt-1">Manage your product inventory</p>
+        </div>
+        <Link
+          to="/seller/product/new"
+          className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+        >
+          Add Product
+        </Link>
       </div>
+
+      {/* Search bar */}
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg
+              className="h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="Search products by name or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          />
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-gray-600 mt-2">
+            Showing {filteredProducts.length} of {productState.products.length}{" "}
+            products
+          </p>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {(searchTerm ? filteredProducts : productState.products).map(
+          (product: ProductDTO) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow"
+            >
+              <div className="relative">
+                <img
+                  src={`http://localhost:5155/products/${product.image}`}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                />
+                {product.quantity === 0 && (
+                  <div className="absolute top-2 right-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
+                    Out of stock
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4">
+                <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-1">
+                  {product.name}
+                </h3>
+                <p className="text-green-700 font-bold text-xl mb-2">
+                  ${product.price}
+                </p>
+
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  {product.description}
+                </p>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                  <span>Stock: {product.quantity}</span>
+                  <span>{product.reviews} reviews</span>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex space-x-2 mt-4">
+                  <button
+                    onClick={() => openEditDialog(product)}
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => openDeleteDialog(product)}
+                    className="flex-1 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+
+                <div className="flex items-center mt-4 pt-3 border-t border-gray-100">
+                  <div className="flex-shrink-0">
+                    {product.seller?.photo ? (
+                      <img
+                        src={`http://localhost:5155/${product.seller.photo}`}
+                        alt={product.seller.username}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-500">
+                          {product.seller?.username?.charAt(0) || "U"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="ml-2 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {product.seller?.username || "Unknown"}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {product.seller?.shopName || "No shop"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+
+      {/* Empty search state */}
+      {searchTerm && filteredProducts.length === 0 && (
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <svg
+              className="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No matching products
+          </h3>
+          <p className="text-gray-600">Try adjusting your search terms</p>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Delete Product
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to delete "{selectedProduct?.name}"? This
+              action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setDeleteDialogOpen(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Dialog */}
+      {editDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Edit Product
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Would you like to edit "{selectedProduct?.name}"?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setEditDialogOpen(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEdit}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

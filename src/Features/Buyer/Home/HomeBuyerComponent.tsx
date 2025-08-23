@@ -1,75 +1,36 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Categories } from "../../Seller/Products/Enums/Caterories";
+import { useDispatch, useSelector } from "react-redux";
+import { type AppDispatch, type RootState } from "../../store";
+import { GetProduct } from "../../Seller/Products/Show/GetProductThunk";
+import type { ProductDTO } from "../../Seller/Products";
 
 export default function HomeBuyerComponent() {
-  const fakeProducts = [
-    {
-      id: 1,
-      name: "Organic Cotton T-Shirt",
-      price: 29.99,
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop",
-      rating: 4.5,
-      reviews: 128,
-      category: "Clothing",
-      seller: "EcoFashion"
-    },
-    {
-      id: 2,
-      name: "Wireless Bluetooth Headphones",
-      price: 89.99,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
-      rating: 4.8,
-      reviews: 256,
-      category: "Electronics",
-      seller: "TechGadgets"
-    },
-    {
-      id: 3,
-      name: "Handmade Ceramic Coffee Mug",
-      price: 24.99,
-      image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400&h=300&fit=crop",
-      rating: 4.7,
-      reviews: 89,
-      category: "Home & Kitchen",
-      seller: "ArtisanPottery"
-    },
-    {
-      id: 4,
-      name: "Natural Bamboo Cutting Board",
-      price: 39.99,
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
-      rating: 4.6,
-      reviews: 156,
-      category: "Kitchen",
-      seller: "EcoHome"
-    },
-    {
-      id: 5,
-      name: "Yoga Mat Premium",
-      price: 49.99,
-      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop",
-      rating: 4.9,
-      reviews: 342,
-      category: "Fitness",
-      seller: "FitLife"
-    },
-    {
-      id: 6,
-      name: "Leather Crossbody Bag",
-      price: 79.99,
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
-      rating: 4.4,
-      reviews: 201,
-      category: "Accessories",
-      seller: "StyleBoutique"
-    }
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const productState = useSelector((s: RootState) => s.product.get);
+  
+  useEffect(() => {
+    dispatch(GetProduct());
+  }, [dispatch]);
 
-  const categories = ["All", "Clothing", "Electronics", "Home & Kitchen", "Fitness", "Accessories"];
+  const categoryEntries = Object.entries(Categories).filter(([key]) => isNaN(Number(key)));
+  const categories = categoryEntries.map(([key]) => key);
+
+  const products = productState.products || [];
+
+  const handleProductClick = (productId: number) => {
+    navigate(`/buyer/details/${productId}`);
+  };
+
+  const handleVisitStore = (sellerId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigating to product details
+    navigate(`/buyer/store/${sellerId}`);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100">
-     
-      
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Shop by Category</h3>
@@ -93,48 +54,78 @@ export default function HomeBuyerComponent() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {fakeProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-green-100">
-                <div className="relative">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-t-2xl"
-                  />
-                  <div className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                    Popular
-                  </div>
-                </div>
-                
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                    <span className="text-green-600 font-bold">${product.price}</span>
+          {products.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No products available yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map((product: ProductDTO) => (
+                <div 
+                  key={product.id} 
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-green-100 cursor-pointer"
+                  onClick={() => handleProductClick(product.id)}
+                >
+                  <div className="relative">
+                    <img
+                      src={`http://localhost:5155/products/${product.image}`}
+                      alt={product.name}
+                      className="w-full h-48 object-cover rounded-t-2xl"
+                    />
+                    {product.quantity === 0 && (
+                      <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                        Out of stock
+                      </div>
+                    )}
+                    {product.reviews > 10 && (
+                      <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                        Popular
+                      </div>
+                    )}
                   </div>
                   
-                  <p className="text-gray-600 text-sm mb-3">{product.category}</p>
-                  
-                  <div className="flex items-center mb-3">
-                    <div className="flex text-yellow-400">
-                      {"★".repeat(Math.floor(product.rating))}
-                      {"☆".repeat(5 - Math.floor(product.rating))}
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                      <span className="text-green-600 font-bold">${product.price}</span>
                     </div>
-                    <span className="text-gray-500 text-sm ml-2">
-                      ({product.reviews} reviews)
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">By {product.seller}</span>
-                    <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm font-medium">
-                      Add to Cart
-                    </button>
+                    
+                    <p className="text-gray-600 text-sm mb-3">
+                      {categoryEntries.find(([key, value]) => value === product.category)?.[0] || 'Unknown'}
+                    </p>
+                    
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+                    
+                    <div className="flex items-center mb-3">
+                      <div className="flex text-yellow-400">
+                        {"★".repeat(Math.min(5, Math.floor(product.reviews / 2)))}
+                        {"☆".repeat(5 - Math.min(5, Math.floor(product.reviews / 2)))}
+                      </div>
+                      <span className="text-gray-500 text-sm ml-2">
+                        ({product.reviews} reviews)
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">
+                        By {product.seller?.shopName || product.seller?.username || 'Unknown'}
+                      </span>
+                      <button 
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent navigating to product details
+                          console.log("Add to cart:", product.id);
+                          // Add your add to cart logic here
+                        }}
+                      >
+                        View Details
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white mb-8">
@@ -152,34 +143,60 @@ export default function HomeBuyerComponent() {
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Top Sellers</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { name: "EcoFashion", products: 42, rating: 4.9 },
-              { name: "TechGadgets", products: 38, rating: 4.8 },
-              { name: "ArtisanPottery", products: 27, rating: 4.7 }
-            ].map((seller, index) => (
-              <div key={index} className="bg-white p-4 rounded-2xl shadow-md border border-green-100">
-                <div className="flex items-center mb-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-green-600 font-bold">{seller.name.charAt(0)}</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">{seller.name}</h4>
-                    <div className="flex text-yellow-400 text-sm">
-                      {"★".repeat(Math.floor(seller.rating))}
+            {products
+              .filter(product => product.seller)
+              .reduce((sellers: any[], product) => {
+                const existingSeller = sellers.find(s => s.id === product.seller?.id);
+                if (existingSeller) {
+                  existingSeller.products++;
+                  existingSeller.rating = Math.max(existingSeller.rating, product.reviews / 20);
+                } else if (product.seller) {
+                  sellers.push({
+                    id: product.seller.id,
+                    name: product.seller.shopName || product.seller.username,
+                    products: 1,
+                    rating: Math.min(5, product.reviews / 20),
+                    photo: product.seller.photo
+                  });
+                }
+                return sellers;
+              }, [])
+              .sort((a, b) => b.products - a.products)
+              .slice(0, 3)
+              .map((seller) => (
+                <div key={seller.id} className="bg-white p-4 rounded-2xl shadow-md border border-green-100">
+                  <div className="flex items-center mb-3">
+                    {seller.photo ? (
+                      <img
+                        src={`http://localhost:5155/${seller.photo}`}
+                        alt={seller.name}
+                        className="w-12 h-12 rounded-full object-cover mr-3"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <span className="text-green-600 font-bold">{seller.name.charAt(0)}</span>
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-semibold">{seller.name}</h4>
+                      <div className="flex text-yellow-400 text-sm">
+                        {"★".repeat(Math.floor(seller.rating))}
+                        {"☆".repeat(5 - Math.floor(seller.rating))}
+                      </div>
                     </div>
                   </div>
+                  <p className="text-gray-600 text-sm">{seller.products} products</p>
+                  <button 
+                    className="w-full mt-3 bg-green-100 text-green-700 py-2 rounded-lg hover:bg-green-200 transition"
+                    onClick={() => navigate(`/buyer/store/${seller.id}`)}
+                  >
+                    Visit Store
+                  </button>
                 </div>
-                <p className="text-gray-600 text-sm">{seller.products} products</p>
-                <button className="w-full mt-3 bg-green-100 text-green-700 py-2 rounded-lg hover:bg-green-200 transition">
-                  Visit Store
-                </button>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </main>
-
-    
     </div>
-  )
+  );
 }

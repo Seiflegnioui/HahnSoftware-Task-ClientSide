@@ -12,6 +12,10 @@ import BuyerGuestLayout from "../Layouts/BuyerGuestLayout";
 import CreateBuyerComponent from "../Features/Buyer/Create/CreateBuyerComponent";
 import BuyerLayout from "../Layouts/BuyerLayout";
 import HomeBuyerComponent from "../Features/Buyer/Home/HomeBuyerComponent";
+import ProductDetailsComponent from "../Features/Buyer/Product/ProductDetailsComponent";
+import GetBuyerOrdersComponent from "../Features/Order/Buyer/Get/GetBuyerOrdersComponent";
+import LoginComponent from "../Features/User/Login/LoginComponent";
+import GetSellerOrdersComponent from "../Features/Order/Seller/Get/GetSellerOrdersComponent";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "login",
+        element: <LoginComponent />,
       },
     ],
   },
@@ -47,6 +55,7 @@ export const router = createBrowserRouter([
         path: "create",
         element: <CreateBuyerComponent />,
       },
+      
     ],
   },
 
@@ -66,6 +75,10 @@ export const router = createBrowserRouter([
         path: "product/new",
         element: <CreateProductComponent />,
       },
+      {
+        path: "orders",
+        element: <GetSellerOrdersComponent />,
+      },
     ],
   },
   {
@@ -75,6 +88,14 @@ export const router = createBrowserRouter([
       {
         path: "home",
         element: <HomeBuyerComponent />,
+      },
+      {
+        path: "details/:id",
+        element: <ProductDetailsComponent />,
+      },
+      {
+        path: "orders",
+        element: <GetBuyerOrdersComponent />,
       },
       
     ],
