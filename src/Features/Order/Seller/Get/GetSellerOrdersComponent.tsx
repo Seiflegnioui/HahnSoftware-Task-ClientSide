@@ -5,12 +5,14 @@ import { useAppContext } from '../../../../API/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { SellerOrder } from './GetBuyerOrderThunk';
 import { OrderState, type OrderDTO } from '../..';
+import { UpdateState } from '../UpdateState/UpdateStateThunk';
 
 export default function GetSellerOrdersComponent() {
   const { connectedSellerOrBuyer } = useAppContext();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const ordersState = useSelector((s: RootState) => s.order.sellerOrders);
+  const updateState = useSelector((s: RootState) => s.order.updateOrderState); 
   const [orders, setOrders] = useState<OrderDTO[]>([]);
 
   useEffect(() => {
@@ -27,36 +29,46 @@ export default function GetSellerOrdersComponent() {
     }
   }, [ordersState.orders]);
 
-  const handleApprove = (orderId: number) => {
-    console.log("Approving order:", orderId, "with state:", OrderState.APPROVED);
+  const handleStateUpdate = (orderId: number, newState: OrderState) => {
+    console.log("Updating order:", orderId, "with state:", newState);
     
-    // Update local state for immediate UI feedback
     setOrders(prevOrders => 
       prevOrders.map(order => 
         order.id === orderId 
-          ? { ...order, state: OrderState.APPROVED }
+          ? { ...order, state: newState }
           : order
       )
     );
     
-    // Here you would normally make an API call
-    // axiosClient.patch(`/order/update/${orderId}`, { state: OrderState.APPROVED })
+    dispatch(UpdateState({ orderId, state: newState }))
+      .unwrap()
+      .then((updatedOrder) => {
+        console.log("Order state updated successfully:", updatedOrder);
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.id === updatedOrder.id ? updatedOrder : order
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to update order state:", error);
+        // Revert local state change if the API call fails
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.id === orderId 
+              ? { ...order, state: OrderState.PENDING } // Revert to previous state
+              : order
+          )
+        );
+      });
+  };
+
+  const handleApprove = (orderId: number) => {
+    handleStateUpdate(orderId, OrderState.APPROVED);
   };
 
   const handleReject = (orderId: number) => {
-    console.log("Rejecting order:", orderId, "with state:", OrderState.REJECTED);
-    
-    // Update local state for immediate UI feedback
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
-        order.id === orderId 
-          ? { ...order, state: OrderState.REJECTED }
-          : order
-      )
-    );
-    
-    // Here you would normally make an API call
-    // axiosClient.patch(`/order/update/${orderId}`, { state: OrderState.REJECTED })
+    handleStateUpdate(orderId, OrderState.REJECTED);
   };
 
   const getOrderStatusText = (state: OrderState) => {
@@ -115,6 +127,16 @@ export default function GetSellerOrdersComponent() {
           </button>
         </div>
 
+        {/* Show update state errors */}
+        {updateState.errors.length > 0 && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-lg">
+            <h3 className="font-semibold mb-2">Update Error</h3>
+            {updateState.errors.map((error, index) => (
+              <p key={index} className="text-sm">{error}</p>
+            ))}
+          </div>
+        )}
+
         {!orders || orders.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="text-gray-500 text-xl mb-4">No orders found</div>
@@ -172,15 +194,17 @@ export default function GetSellerOrdersComponent() {
                         <div className="flex gap-3">
                           <button
                             onClick={() => handleReject(order.id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                            disabled={updateState.loading}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            Reject
+                            {updateState.loading ? "Processing..." : "Reject"}
                           </button>
                           <button
                             onClick={() => handleApprove(order.id)}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                            disabled={updateState.loading}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            Approve
+                            {updateState.loading ? "Processing..." : "Approve"}
                           </button>
                         </div>
                       )}

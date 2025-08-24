@@ -5,9 +5,11 @@ import type { RootState, AppDispatch } from "../../../store";
 import { DeleteProduct, GetProduct } from "./GetProductThunk";
 import { useAppContext } from "../../../../API/AppContext";
 import type { ProductDTO } from "..";
+import type { UserDTO } from "../../../User/UserSlice";
+import type { SellerDTO } from "../../Create/CreateSellerSlice";
 
 export default function ShowProductComponent() {
-  const { connectedSellerOrBuyer } = useAppContext();
+  const { connectedSellerOrBuyer,getSellerOrBuyer ,refreshUser} = useAppContext();
   const location = useLocation();
   const [notification, setNotification] = useState<{
     message: string;
@@ -23,10 +25,14 @@ export default function ShowProductComponent() {
     null
   );
 
-  useEffect(() => {
-    dispatch(GetProduct(connectedSellerOrBuyer?.id));
-    console.log();
-  }, [connectedSellerOrBuyer?.id, dispatch]);
+useEffect(() => {
+  console.log("connectedSellerOrBuyer changed:", connectedSellerOrBuyer);
+  
+  if (connectedSellerOrBuyer && connectedSellerOrBuyer.id) {
+    console.log("Dispatching GetProduct with ID:", connectedSellerOrBuyer.id);
+    dispatch(GetProduct(connectedSellerOrBuyer.id));
+  }
+}, [connectedSellerOrBuyer, dispatch]); 
 
   useEffect(() => {
     if (location.state?.message) {
@@ -71,7 +77,6 @@ export default function ShowProductComponent() {
 
   const handleEdit = () => {
     console.log("Editing product:", selectedProduct);
-    // Add your edit logic here
     setEditDialogOpen(false);
     setSelectedProduct(null);
   };
@@ -141,7 +146,6 @@ export default function ShowProductComponent() {
         </Link>
       </div>
 
-      {/* Search bar */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
         <div className="relative max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

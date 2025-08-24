@@ -7,17 +7,17 @@ import type { BuyerDTO } from "../Features/Buyer/Create/CreateBuyerSlice";
 interface AppContextType {
   connectedUser: UserDTO | null | undefined;
   connectedSellerOrBuyer: SellerDTO | BuyerDTO | null | undefined;
-  refreshUser: () => Promise<void>;
-  getSellerOrBuyer: (UserId: number, role: string) => Promise<void>; 
+  refreshUser: () => Promise<UserDTO>;
+  getSellerOrBuyer: (UserId: number, role: string) => Promise<SellerDTO | BuyerDTO | null>;
 }
 
 export const AppContextContainer = createContext<AppContextType>({
   connectedUser: null,
-  connectedSellerOrBuyer:null,
-  refreshUser: async () => {},
-  getSellerOrBuyer:async (UserId: number, role: string) => {}
-
+  connectedSellerOrBuyer: null,
+  refreshUser: async () => Promise.resolve({} as UserDTO),
+  getSellerOrBuyer: async (UserId: number, role: string) => Promise.resolve(null),
 });
+
 
 interface AppContextProps {
   children: ReactNode;

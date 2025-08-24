@@ -7,7 +7,7 @@ export const GetProduct = createAsyncThunk<
   number | undefined,    
   { rejectValue: string }
 >(
-  "product/get",
+  "product/get/all",
   async (sellerId, thunkAPI) => {
     try {
       const url = sellerId ? `/product/get?sellerId=${sellerId}` : `/product/get`;

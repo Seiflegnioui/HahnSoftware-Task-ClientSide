@@ -4,11 +4,13 @@ import type { ProductDTO } from "../Seller/Products"
 import sendOrderReducer from "../Order/Buyer/Create/SendOrderSlice"
 import GetBuyerOrdersReducer from "../Order/Buyer/Get/GetBuyerOrdersSlice"
 import GetSellerOrdersReducer from "../Order/Seller/Get/GetSellerOrderSlice"
+import UpdateOrdersStateReducer from "../Order/Seller/UpdateState/UpdateStateSlice"
 
 const orderReducer = combineReducers({
   send: sendOrderReducer,
   buyerOrders : GetBuyerOrdersReducer,
   sellerOrders : GetSellerOrdersReducer,
+  updateOrderState : UpdateOrdersStateReducer
  
 });
 
