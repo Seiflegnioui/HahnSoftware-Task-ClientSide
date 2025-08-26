@@ -29,7 +29,7 @@ export interface UserDTO {
 interface UserState {
     user: UserDTO | undefined;
     loading: boolean;
-    errors: string[];
+    errors: string[] | undefined;
 }
 
 const initialState: UserState = {
@@ -54,7 +54,7 @@ const CreateUserSlice = createSlice({
 
         builder.addCase(CreateUser.rejected, (state, action) => {
             state.loading = false;
-            state.errors = [action.error.message ?? "Unknown error"];
+            state.errors = action.payload;
         });
     }
 });

@@ -11,9 +11,7 @@ export const BuyerOrders = createAsyncThunk<
   "orders/buyer",
   async (id, thunkAPI) => {
     try {
-      const { data } = await axiosClient.get(`/order/get?buyerId=${id}`);
-      console.log(data);
-      
+      const { data } = await axiosClient.get(`/order/get?buyerId=${id}`);     
       return data as OrderDTO[];
     } catch (error: any) {
       console.error("Error fetching orders details:", error);

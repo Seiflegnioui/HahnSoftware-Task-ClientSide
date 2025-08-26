@@ -16,6 +16,8 @@ import ProductDetailsComponent from "../Features/Buyer/Product/ProductDetailsCom
 import GetBuyerOrdersComponent from "../Features/Order/Buyer/Get/GetBuyerOrdersComponent";
 import LoginComponent from "../Features/User/Login/LoginComponent";
 import GetSellerOrdersComponent from "../Features/Order/Seller/Get/GetSellerOrdersComponent";
+import SellerProfileComponent from "../Features/Seller/Profile/SellerProfileComponent";
+import NotificationsPage from "../Features/Notification/Get/NotificationPage";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +57,7 @@ export const router = createBrowserRouter([
         path: "create",
         element: <CreateBuyerComponent />,
       },
+
       
     ],
   },
@@ -79,6 +82,14 @@ export const router = createBrowserRouter([
         path: "orders",
         element: <GetSellerOrdersComponent />,
       },
+       {
+        path: "profile",
+        element: <SellerProfileComponent />,
+      },
+       {
+        path: "notifications",
+        element: <NotificationsPage />,
+      },
     ],
   },
   {
@@ -97,7 +108,10 @@ export const router = createBrowserRouter([
         path: "orders",
         element: <GetBuyerOrdersComponent />,
       },
-      
+       {
+        path: "notifications",
+        element: <NotificationsPage />,
+      },
     ],
   },
 ]);

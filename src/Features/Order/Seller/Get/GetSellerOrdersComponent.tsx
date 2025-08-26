@@ -16,7 +16,6 @@ export default function GetSellerOrdersComponent() {
   const [orders, setOrders] = useState<OrderDTO[]>([]);
 
   useEffect(() => {
-    console.log("Connected seller:", connectedSellerOrBuyer);
     
     if (connectedSellerOrBuyer?.id) {
       dispatch(SellerOrder(connectedSellerOrBuyer.id));
@@ -29,9 +28,7 @@ export default function GetSellerOrdersComponent() {
     }
   }, [ordersState.orders]);
 
-  const handleStateUpdate = (orderId: number, newState: OrderState) => {
-    console.log("Updating order:", orderId, "with state:", newState);
-    
+  const handleStateUpdate = (orderId: number, newState: OrderState) => {    
     setOrders(prevOrders => 
       prevOrders.map(order => 
         order.id === orderId 
@@ -43,7 +40,6 @@ export default function GetSellerOrdersComponent() {
     dispatch(UpdateState({ orderId, state: newState }))
       .unwrap()
       .then((updatedOrder) => {
-        console.log("Order state updated successfully:", updatedOrder);
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.id === updatedOrder.id ? updatedOrder : order
@@ -52,11 +48,10 @@ export default function GetSellerOrdersComponent() {
       })
       .catch((error) => {
         console.error("Failed to update order state:", error);
-        // Revert local state change if the API call fails
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.id === orderId 
-              ? { ...order, state: OrderState.PENDING } // Revert to previous state
+              ? { ...order, state: OrderState.PENDING } 
               : order
           )
         );
@@ -127,7 +122,6 @@ export default function GetSellerOrdersComponent() {
           </button>
         </div>
 
-        {/* Show update state errors */}
         {updateState.errors.length > 0 && (
           <div className="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-lg">
             <h3 className="font-semibold mb-2">Update Error</h3>
@@ -189,7 +183,6 @@ export default function GetSellerOrdersComponent() {
                         <p className="text-gray-600 text-sm">{new Date(order.addedAt).toLocaleTimeString()}</p>
                       </div>
                       
-                      {/* Approve/Reject Buttons - Only show for pending orders */}
                       {order.state === OrderState.PENDING && (
                         <div className="flex gap-3">
                           <button

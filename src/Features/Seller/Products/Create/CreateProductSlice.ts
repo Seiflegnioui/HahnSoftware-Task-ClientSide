@@ -7,7 +7,7 @@ import type { ProductDTO } from "..";
 interface ProductState {
   product: ProductDTO | null;
   loading: boolean;
-  errors: string[];
+  errors: string[] | undefined;
 }
 
 const initialState: ProductState = {
@@ -32,11 +32,9 @@ const ProductSlice = createSlice({
         state.errors = [];
       }
     );
-    builder.addCase(CreateProduct.rejected, (state, action) => {
+    builder.addCase(CreateProduct.rejected, (state, {payload}) => {
       state.loading = false;
-      state.errors = [
-        action.payload ?? action.error.message ?? "Unknown error",
-      ];
+      state.errors = payload;
     });
   },
 });

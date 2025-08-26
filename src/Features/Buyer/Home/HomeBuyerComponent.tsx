@@ -5,11 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { type AppDispatch, type RootState } from "../../store";
 import { GetProduct } from "../../Seller/Products/Show/GetProductThunk";
 import type { ProductDTO } from "../../Seller/Products";
+import { ReviewProduct } from "../Product/Reviewed/MarkReviewedThunk";
 
 export default function HomeBuyerComponent() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const productState = useSelector((s: RootState) => s.product.get);
+  const ReviewproductState = useSelector((s: RootState) => s.product.reviewed);
   
   useEffect(() => {
     dispatch(GetProduct());
@@ -24,10 +26,7 @@ export default function HomeBuyerComponent() {
     navigate(`/buyer/details/${productId}`);
   };
 
-  const handleVisitStore = (sellerId: number, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigating to product details
-    navigate(`/buyer/store/${sellerId}`);
-  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100">
@@ -64,7 +63,10 @@ export default function HomeBuyerComponent() {
                 <div 
                   key={product.id} 
                   className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-green-100 cursor-pointer"
-                  onClick={() => handleProductClick(product.id)}
+                  onClick={() => {
+                    handleProductClick(product.id);
+                    dispatch(ReviewProduct(product.id))
+                  } }
                 >
                   <div className="relative">
                     <img
@@ -110,16 +112,7 @@ export default function HomeBuyerComponent() {
                       <span className="text-sm text-gray-500">
                         By {product.seller?.shopName || product.seller?.username || 'Unknown'}
                       </span>
-                      <button 
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm font-medium"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent navigating to product details
-                          console.log("Add to cart:", product.id);
-                          // Add your add to cart logic here
-                        }}
-                      >
-                        View Details
-                      </button>
+                     
                     </div>
                   </div>
                 </div>

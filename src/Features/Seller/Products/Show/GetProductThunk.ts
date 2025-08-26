@@ -30,9 +30,8 @@ export const DeleteProduct = createAsyncThunk<
   "product/delete",
   async (id, thunkAPI) => {
     try {
-      // Fixed URL template literal
       const { data } = await axiosClient.delete(`/product/delete?id=${id}`);
-      // Return the deleted product data
+      
       return data as ProductDTO;
     } catch (error: any) {
       console.error(error.response?.data || error.message);

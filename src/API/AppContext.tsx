@@ -9,6 +9,8 @@ interface AppContextType {
   connectedSellerOrBuyer: SellerDTO | BuyerDTO | null | undefined;
   refreshUser: () => Promise<UserDTO>;
   getSellerOrBuyer: (UserId: number, role: string) => Promise<SellerDTO | BuyerDTO | null>;
+  setconnectedSellerOrBuyer: (val: SellerDTO | BuyerDTO | null | undefined) => void;
+  setConnectedUser: (val: UserDTO | null | undefined) => void;
 }
 
 export const AppContextContainer = createContext<AppContextType>({
@@ -16,6 +18,8 @@ export const AppContextContainer = createContext<AppContextType>({
   connectedSellerOrBuyer: null,
   refreshUser: async () => Promise.resolve({} as UserDTO),
   getSellerOrBuyer: async (UserId: number, role: string) => Promise.resolve(null),
+  setconnectedSellerOrBuyer: (val: SellerDTO | BuyerDTO | null | undefined) => {},
+  setConnectedUser: (val: UserDTO | null | undefined) => {}
 });
 
 
@@ -39,9 +43,7 @@ export default function AppContext({ children }: AppContextProps) {
 
    const getSellerOrBuyer = useCallback(async (UserId:number,role:string) => {
     try {
-      const { data } = await axiosClient.get(`/${role}/get?id=${UserId}`);
-      console.log(`/${role}/get?id=${UserId}`,data);
-      
+      const { data } = await axiosClient.get(`/${role}/get?id=${UserId}`);      
       setconnectedSellerOrBuyer(data);
       return data.data
     } catch (error) {
@@ -61,7 +63,7 @@ export default function AppContext({ children }: AppContextProps) {
   }, [refreshUser]); 
 
   return (
-    <AppContextContainer.Provider value={{ connectedUser, refreshUser,connectedSellerOrBuyer,getSellerOrBuyer }}>
+    <AppContextContainer.Provider value={{ connectedUser, refreshUser,connectedSellerOrBuyer,getSellerOrBuyer,setconnectedSellerOrBuyer,setConnectedUser }}>
       {children}
     </AppContextContainer.Provider>
   );

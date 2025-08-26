@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAppContext } from '../API/AppContext';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../Features/store';
@@ -11,9 +11,10 @@ export default function BuyerLayout() {
   const notifState = useSelector((state: RootState) => state.notification.get);
   const navigate = useNavigate();
   const location = useLocation();
-  const { connectedUser } = useAppContext();
+  const { connectedUser, refreshUser,setconnectedSellerOrBuyer,setConnectedUser } = useAppContext();
   const [OpenPage, SetOpenPage] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
 
   const UnseenNotifications = notifState.notifications 
     ? notifState.notifications.filter(n => !n.seen).length 
@@ -35,6 +36,15 @@ export default function BuyerLayout() {
       dispatch(GetNotifs(connectedUser.id));
     }
   }, [connectedUser, navigate, dispatch]);
+
+  const handleLogout = () => {
+    setConnectedUser(undefined)
+    setconnectedSellerOrBuyer(undefined)
+    localStorage.removeItem("TOKEN");
+    refreshUser();
+    navigate("/guest/user");
+    setShowLogoutDropdown(false);
+  };
 
   if (!OpenPage) return null;
 
@@ -99,7 +109,7 @@ export default function BuyerLayout() {
                     <div className="max-h-96 overflow-y-auto">
                       {notifState.notifications && notifState.notifications.length > 0 ? (
                         notifState.notifications.map((notification: NotificationDTO) => (
-                          <div
+                          <Link to="/buyer/notifications"
                             key={notification.id}
                             className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
                               !notification.seen ? 'bg-blue-50' : ''
@@ -123,7 +133,7 @@ export default function BuyerLayout() {
                                 </span>
                               )}
                             </div>
-                          </div>
+                          </Link>
                         ))
                       ) : (
                         <div className="p-8 text-center text-gray-500">
@@ -135,13 +145,29 @@ export default function BuyerLayout() {
                 )}
               </div>
 
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white font-medium">
-                  {connectedUser?.username?.[0]?.toUpperCase() || 'B'}
-                </div>
-                <span className="text-sm font-medium text-gray-700">
-                  {connectedUser?.username || 'Buyer'}
-                </span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowLogoutDropdown(!showLogoutDropdown)}
+                  className="flex items-center space-x-3 focus:outline-none"
+                >
+                  <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white font-medium">
+                    {connectedUser?.username?.[0]?.toUpperCase() || 'B'}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">
+                    {connectedUser?.username || 'Buyer'}
+                  </span>
+                </button>
+
+                {showLogoutDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-green-600 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

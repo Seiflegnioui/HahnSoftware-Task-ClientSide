@@ -16,9 +16,8 @@ export const LoginUser = createAsyncThunk<
       return data.data as UserDTO;
 
     } catch (error: any) {
-      console.error("Login error:", error);
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Login failed"
+        error.response.data[0] || "Login failed"
       );
     }
   }

@@ -7,15 +7,17 @@ export const CreateProduct = createAsyncThunk<
   FormData
   
   ,    
-  { rejectValue: string }
->("product/create", async (dto: FormData, thunkAPI) => {
+  { rejectValue: string[] }
+>("product/create", async (dto: FormData, thunk) => {
   try {
     const { data } = await axiosClient.post("/product/create", dto);
     return data.data as ProductDTO; 
   } catch (error: any) {
-    console.error(error.response?.data || error.message);
-    return thunkAPI.rejectWithValue(
-      error.response?.data?.message || "Failed to create product"
+
+     if(Array.isArray(error.response.data.Errors)){
+        return thunk.rejectWithValue(error.response.data.Errors);
+      }
+    return thunk.rejectWithValue([ "Failed to create product"]
     );
   }
 });

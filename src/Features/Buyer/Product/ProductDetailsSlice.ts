@@ -17,21 +17,13 @@ const initialState: ProductState = {
 const ProductDetailsSlice = createSlice({ 
   name: "details", 
   initialState,
-  reducers: {
-    // Optional: Add a clear action to reset the state
-    clearProductDetails: (state) => {
-      state.product = null;
-      state.loading = false;
-      state.errors = [];
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(ProductDetails.pending, (state) => {
       state.loading = true;
       state.errors = [];
     });
     builder.addCase(ProductDetails.fulfilled, (state, action: PayloadAction<ProductDTO>) => {
-      console.log(action.payload);
       state.loading = false;
       state.product = action.payload;
       state.errors = [];
@@ -43,5 +35,4 @@ const ProductDetailsSlice = createSlice({
   },
 });
 
-export const { clearProductDetails } = ProductDetailsSlice.actions;
 export default ProductDetailsSlice.reducer;

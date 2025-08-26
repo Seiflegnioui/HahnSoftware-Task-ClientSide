@@ -127,28 +127,25 @@ export default function CreateSellerComponent() {
     formData.append("mySource", seller.mySource.toString());
 
     dispatch(CreateSeller(formData))
-    .unwrap()
-    .then(() => {
-
-      refreshUser().then(() => {
-
-        navigate("/seller/home");
-      }).catch((refreshError) => {
-        console.error("Error in refreshUser:", refreshError);
+      .unwrap()
+      .then(() => {
+        refreshUser()
+          .then(() => {
+            navigate("/seller/home");
+          })
+          .catch((refreshError) => {
+            console.error("Error in refreshUser:", refreshError);
+          });
+      })
+      .catch((error) => {
+        console.error(error);
       });
-    })
-    .catch((error) => {
-      console.error(error);
-      
-    });
 
-    console.log(...formData.entries());
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
       <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl">
-        {/* Loading Overlay */}
         {sellerState.loading && (
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 rounded-2xl">
             <div className="flex flex-col items-center">
@@ -188,7 +185,15 @@ export default function CreateSellerComponent() {
             </p>
           </div>
         </div>
-
+             {sellerState.errors && sellerState.errors.length > 0 && (
+              <div className="mt-6 bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 space-y-2">
+                {sellerState.errors.map((err: string, index: number) => (
+                  <p key={index} className="text-sm">
+                    • {err}
+                  </p>
+                ))}
+              </div>
+            )}
         <form
           onSubmit={handleSubmit}
           className="space-y-6"
@@ -353,7 +358,6 @@ export default function CreateSellerComponent() {
             </div>
           )}
 
-          {/* Slide 3: Physical Store */}
           {currentSlide === 2 && (
             <div className="space-y-6">
               <div className="flex items-center">
@@ -447,7 +451,6 @@ export default function CreateSellerComponent() {
             </div>
           )}
 
-          {/* Slide 4: Online Presence */}
           {currentSlide === 3 && (
             <div className="space-y-6">
               <div>
@@ -591,6 +594,7 @@ export default function CreateSellerComponent() {
             )}
           </div>
         </form>
+           
       </div>
     </div>
   );

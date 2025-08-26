@@ -31,6 +31,14 @@ export interface OrderDTO {
 
 }
 
+export interface OrderCountsDTO {
+            ordersCount:number,
+          recentOrdersCount  :number,
+
+
+}
+
+
 export const OrderState = {
        PENDING : 0,
         APPROVED : 1,

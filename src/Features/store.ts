@@ -5,15 +5,18 @@ import BuyerReducer from './Buyer/Create/CreateBuyerSlice'
 import orderReducer from '../Features/Order/index'
 import { productReducer } from "./Seller/Products";
 import NotificationReducer from "./Notification";
+import SellerHomeReducer from "./Seller/Home/SellerHomeSlice"
+
 
 export const store = configureStore({
     reducer:{
         user: UserReducer,
         seller : SellerReducer,
+        sellerHome : SellerHomeReducer,
         buyer : BuyerReducer,
         product: productReducer,
         order : orderReducer,
-        notification : NotificationReducer
+        notification : NotificationReducer,
     }
     
 })

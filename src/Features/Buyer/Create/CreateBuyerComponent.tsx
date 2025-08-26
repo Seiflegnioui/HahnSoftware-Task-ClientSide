@@ -28,15 +28,17 @@ export default function CreateBuyerComponent() {
       mySource: parseInt(form.mySource.value) as Sources,
     };
 
-    console.log(payload);
-    
-    dispatch(CreateBuyer(payload)).unwrap()
+
+    dispatch(CreateBuyer(payload))
+      .unwrap()
       .then(() => {
-        refreshUser().then(() => {
-          navigate("/buyer/home");
-        }).catch((refreshError) => {
-          console.error("Error in refreshUser:", refreshError);
-        });
+        refreshUser()
+          .then(() => {
+            navigate("/buyer/home");
+          })
+          .catch((refreshError) => {
+            console.error("Error in refreshUser:", refreshError);
+          });
       })
       .catch((error) => {
         console.error(error);
@@ -46,8 +48,7 @@ export default function CreateBuyerComponent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-6">
       <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-2xl border border-green-100">
- 
-         {connectedUser && (
+        {connectedUser && (
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl text-white font-bold">
@@ -57,7 +58,9 @@ export default function CreateBuyerComponent() {
             <h1 className="text-2xl font-bold text-gray-800">
               Welcome, {connectedUser.username}!
             </h1>
-            <p className="text-green-600 mt-1">Complete your buyer profile to get started</p>
+            <p className="text-green-600 mt-1">
+              Complete your buyer profile to get started
+            </p>
           </div>
         )}
 
@@ -80,7 +83,6 @@ export default function CreateBuyerComponent() {
               <input
                 type="date"
                 name="birthdate"
-                required
                 disabled={buyerState.loading}
                 max={new Date().toISOString().split("T")[0]}
                 className="w-full px-4 py-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -94,7 +96,6 @@ export default function CreateBuyerComponent() {
               <select
                 name="mySource"
                 defaultValue={4}
-                required
                 disabled={buyerState.loading}
                 className="w-full px-4 py-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 disabled:opacity-50"
               >
@@ -124,7 +125,6 @@ export default function CreateBuyerComponent() {
                   type="text"
                   name="adress.country"
                   placeholder="Country"
-                  required
                   disabled={buyerState.loading}
                   className="w-full px-4 py-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 disabled:opacity-50 text-sm"
                 />
@@ -138,7 +138,6 @@ export default function CreateBuyerComponent() {
                   type="text"
                   name="adress.city"
                   placeholder="City"
-                  required
                   disabled={buyerState.loading}
                   className="w-full px-4 py-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 disabled:opacity-50 text-sm"
                 />
@@ -146,13 +145,12 @@ export default function CreateBuyerComponent() {
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-2">
-                  Street Address *
+                  Address *
                 </label>
                 <input
                   type="text"
                   name="adress.adress"
-                  placeholder="Street Address"
-                  required
+                  placeholder="Address"
                   disabled={buyerState.loading}
                   className="w-full px-4 py-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 disabled:opacity-50 text-sm"
                 />
@@ -181,6 +179,15 @@ export default function CreateBuyerComponent() {
               </span>
             </div>
           )}
+          {buyerState.errors && buyerState.errors.length > 0 && (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 space-y-2">
+              {buyerState.errors.map((err: string, index: number) => (
+                <p key={index} className="text-sm">
+                  • {err}
+                </p>
+              ))}
+            </div>
+          )}
 
           <button
             type="submit"
@@ -201,11 +208,17 @@ export default function CreateBuyerComponent() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
             By completing your profile, you agree to our{" "}
-            <a href="#" className="text-green-600 hover:text-green-700 underline">
+            <a
+              href="#"
+              className="text-green-600 hover:text-green-700 underline"
+            >
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-green-600 hover:text-green-700 underline">
+            <a
+              href="#"
+              className="text-green-600 hover:text-green-700 underline"
+            >
               Privacy Policy
             </a>
           </p>

@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Sources } from "../../Seller/Create/Enums";
 import { CreateBuyer } from './CreateBuyerThunk';
-import type { UserDTO } from "../../User/UserSlice";
 
 
 export interface CreateBuyerDTO {
@@ -30,7 +29,7 @@ export interface BuyerDTO {
 interface BuyerState {
     buyer: BuyerDTO | undefined;
     loading: boolean;
-    errors: string[];
+    errors: string[] | undefined;
 }
 
 const initialState: BuyerState = {
@@ -53,9 +52,9 @@ const BuyerSlice = createSlice({
             state.errors = [];
         });
 
-        builder.addCase(CreateBuyer.rejected, (state, action) => {
+        builder.addCase(CreateBuyer.rejected, (state, {payload}) => {
             state.loading = false;
-            state.errors = [action.error.message ?? "Unknown error"];
+            state.errors = payload;
         });
     }
 });

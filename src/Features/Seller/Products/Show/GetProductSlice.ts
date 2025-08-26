@@ -25,7 +25,6 @@ const ProductSlice = createSlice({
       state.errors = [];
     });
     builder.addCase(GetProduct.fulfilled, (state, action: PayloadAction<ProductDTO[]>) => {
-      console.log(action.payload);
       state.loading = false;
       state.products = action.payload;
       state.errors = [];
@@ -35,16 +34,14 @@ const ProductSlice = createSlice({
       state.errors = [action.payload || action.error.message || "Unknown error"];
     });
 
-    // DeleteProduct cases
     builder.addCase(DeleteProduct.pending, (state) => {
       state.loading = true;
       state.errors = [];
     });
     builder.addCase(DeleteProduct.fulfilled, (state, action: PayloadAction<ProductDTO>) => {
-      console.log(action.payload);
-      state.loading = false;
-      
+      state.loading = false;      
       if (state.products) {
+
         state.products = state.products.filter(product => product.id !== action.payload.id);
       }
       state.errors = [];

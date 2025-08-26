@@ -15,6 +15,7 @@ export default function LoginComponent() {
   const { loading, error } = useSelector((state: RootState) => state.user.login);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    
     e.preventDefault();
    dispatch(LoginUser({ email, password }))
     .unwrap().then((userDTO) =>{ 

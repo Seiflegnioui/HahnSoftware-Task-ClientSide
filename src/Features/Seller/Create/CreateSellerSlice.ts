@@ -42,7 +42,7 @@ export interface SellerDTO {
 interface SellerState {
     seller: SellerDTO | undefined;
     loading: boolean;
-    errors: string[];
+    errors: string[] | undefined;
 }
 
 const initialState: SellerState = {
@@ -65,9 +65,9 @@ const SellerSlice = createSlice({
             state.errors = [];
         });
 
-        builder.addCase(CreateSeller.rejected, (state, action) => {
+        builder.addCase(CreateSeller.rejected, (state, {payload}) => {
             state.loading = false;
-            state.errors = [action.error.message ?? "Unknown error"];
+            state.errors = payload;
         });
     }
 });

@@ -5,11 +5,10 @@ import type { RootState, AppDispatch } from "../../../store";
 import { DeleteProduct, GetProduct } from "./GetProductThunk";
 import { useAppContext } from "../../../../API/AppContext";
 import type { ProductDTO } from "..";
-import type { UserDTO } from "../../../User/UserSlice";
-import type { SellerDTO } from "../../Create/CreateSellerSlice";
+import { Categories } from "../Enums/Caterories";
 
 export default function ShowProductComponent() {
-  const { connectedSellerOrBuyer,getSellerOrBuyer ,refreshUser} = useAppContext();
+  const { connectedSellerOrBuyer } = useAppContext();
   const location = useLocation();
   const [notification, setNotification] = useState<{
     message: string;
@@ -18,21 +17,19 @@ export default function ShowProductComponent() {
   const dispatch = useDispatch<AppDispatch>();
   const productState = useSelector((s: RootState) => s.product.get);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | "all">("all");
   const [filteredProducts, setFilteredProducts] = useState<ProductDTO[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO | null>(
     null
   );
 
-useEffect(() => {
-  console.log("connectedSellerOrBuyer changed:", connectedSellerOrBuyer);
-  
-  if (connectedSellerOrBuyer && connectedSellerOrBuyer.id) {
-    console.log("Dispatching GetProduct with ID:", connectedSellerOrBuyer.id);
-    dispatch(GetProduct(connectedSellerOrBuyer.id));
-  }
-}, [connectedSellerOrBuyer, dispatch]); 
+  useEffect(() => {
+    
+    if (connectedSellerOrBuyer && connectedSellerOrBuyer.id) {
+      dispatch(GetProduct(connectedSellerOrBuyer.id));
+    }
+  }, [connectedSellerOrBuyer, dispatch]); 
 
   useEffect(() => {
     if (location.state?.message) {
@@ -43,42 +40,39 @@ useEffect(() => {
 
       window.history.replaceState({}, document.title);
 
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+    
     }
 
     if (productState.products) {
-      const filtered = productState.products.filter(
+      let filtered = productState.products.filter(
         (product) =>
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
+
+      if (selectedCategory !== "all") {
+        filtered = filtered.filter(product => product.category === selectedCategory);
+      }
+
       setFilteredProducts(filtered);
     }
-  }, [searchTerm, productState.products]);
+  }, [searchTerm, selectedCategory, productState.products]);
 
   const openDeleteDialog = (product: ProductDTO) => {
     setSelectedProduct(product);
     setDeleteDialogOpen(true);
   };
 
-  const openEditDialog = (product: ProductDTO) => {
-    setSelectedProduct(product);
-    setEditDialogOpen(true);
-  };
-
   const handleDelete = () => {
-    dispatch(DeleteProduct(selectedProduct!.id));
-
-    setDeleteDialogOpen(false);
-    setSelectedProduct(null);
-  };
-
-  const handleEdit = () => {
-    console.log("Editing product:", selectedProduct);
-    setEditDialogOpen(false);
-    setSelectedProduct(null);
+    dispatch(DeleteProduct(selectedProduct!.id))
+      .unwrap()
+      .then(() => {
+        setDeleteDialogOpen(false);
+        setSelectedProduct(null);
+      })
+      .catch((error) => {
+        console.error("Failed to delete product:", error);
+      });
   };
 
   if (productState.loading) {
@@ -146,41 +140,65 @@ useEffect(() => {
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
-        <div className="relative max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              className="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search products by name or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search products by name or description..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-          />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter by Category
+            </label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value === "all" ? "all" : Number(e.target.value))}
+              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="all">All Categories</option>
+              {Object.entries(Categories)
+                .filter(([key]) => isNaN(Number(key)))
+                .map(([key, value]) => (
+                  <option key={value} value={value}>
+                    {key}
+                  </option>
+                ))}
+            </select>
+          </div>
         </div>
-        {searchTerm && (
-          <p className="text-sm text-gray-600 mt-2">
-            Showing {filteredProducts.length} of {productState.products.length}{" "}
-            products
+
+        {(searchTerm || selectedCategory !== "all") && (
+          <p className="text-sm text-gray-600 mt-4">
+            Showing {filteredProducts.length} of {productState.products.length} products
+            {searchTerm && ` matching "${searchTerm}"`}
+            {selectedCategory !== "all" && ` in ${Object.keys(Categories).find(key => Categories[key as keyof typeof Categories] === selectedCategory)}`}
           </p>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {(searchTerm ? filteredProducts : productState.products).map(
+        {(searchTerm || selectedCategory !== "all" ? filteredProducts : productState.products).map(
           (product: ProductDTO) => (
             <div
               key={product.id}
@@ -213,17 +231,11 @@ useEffect(() => {
 
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
                   <span>Stock: {product.quantity}</span>
-                  <span>{product.reviews} reviews</span>
+                  <span>Category: {Object.keys(Categories).find(key => Categories[key as keyof typeof Categories] === product.category) || 'Unknown'}</span>
                 </div>
 
-                {/* Action buttons */}
                 <div className="flex space-x-2 mt-4">
-                  <button
-                    onClick={() => openEditDialog(product)}
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-                  >
-                    Edit
-                  </button>
+                 
                   <button
                     onClick={() => openDeleteDialog(product)}
                     className="flex-1 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
@@ -263,8 +275,7 @@ useEffect(() => {
         )}
       </div>
 
-      {/* Empty search state */}
-      {searchTerm && filteredProducts.length === 0 && (
+      {(searchTerm || selectedCategory !== "all") && filteredProducts.length === 0 && (
         <div className="text-center py-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
             <svg
@@ -284,11 +295,10 @@ useEffect(() => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             No matching products
           </h3>
-          <p className="text-gray-600">Try adjusting your search terms</p>
+          <p className="text-gray-600">Try adjusting your search terms or category filter</p>
         </div>
       )}
 
-      {/* Delete Confirmation Dialog */}
       {deleteDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
@@ -317,33 +327,6 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Edit Dialog */}
-      {editDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Edit Product
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Would you like to edit "{selectedProduct?.name}"?
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setEditDialogOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEdit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

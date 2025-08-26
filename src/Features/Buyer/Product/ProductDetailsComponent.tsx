@@ -20,12 +20,11 @@ export default function ProductDetailsComponent() {
 
   const handleOrder = () => {
     if (!connectedSellerOrBuyer?.id) {
-      console.log("Please log in to place an order");
       return;
     }
 
     if (!productState.product) return;
-
+    
     const orderData = {
       buyerId: connectedSellerOrBuyer.id,
       productId: productState.product.id,
@@ -35,7 +34,6 @@ export default function ProductDetailsComponent() {
     dispatch(SendOrder(orderData))
       .unwrap()
       .then(() => {
-        console.log("Order placed successfully!");
         setQuantity(1);
         navigate("/buyer/orders", {
           state: {
@@ -45,7 +43,6 @@ export default function ProductDetailsComponent() {
         });
       })
       .catch((error) => {
-        console.log(`Failed to place order: ${error.message || error}`);
         navigate("/buyer/home", {
           state: {
             message: `Failed to place order: ${error.message || error}`,
@@ -116,7 +113,6 @@ export default function ProductDetailsComponent() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium"
@@ -125,10 +121,8 @@ export default function ProductDetailsComponent() {
           <span className="ml-2">Back to Products</span>
         </button>
 
-        {/* Product Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="md:flex">
-            {/* Product Image */}
             <div className="md:w-1/2 p-6 flex items-center justify-center">
               <img
                 src={`http://localhost:5155/products/${product.image}`}
@@ -137,7 +131,6 @@ export default function ProductDetailsComponent() {
               />
             </div>
 
-            {/* Product Info */}
             <div className="md:w-1/2 p-8">
               <div className="mb-6">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -151,7 +144,6 @@ export default function ProductDetailsComponent() {
                 </p>
               </div>
 
-              {/* Stock & Reviews */}
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
                   <span className="text-gray-600 font-medium">Stock:</span>

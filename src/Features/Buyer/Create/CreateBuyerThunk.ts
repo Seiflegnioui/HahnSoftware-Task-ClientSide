@@ -5,7 +5,7 @@ import type { BuyerDTO, CreateBuyerDTO } from "./CreateBuyerSlice";
 export const CreateBuyer = createAsyncThunk<
   BuyerDTO,
   CreateBuyerDTO,
-  { rejectValue: string }
+  { rejectValue: string[] }
 >(
   "buyer/create",
   async (buyerDto, thunk) => {
@@ -17,7 +17,10 @@ export const CreateBuyer = createAsyncThunk<
       
       return res.data as BuyerDTO;
     } catch (error: any) {
-      return thunk.rejectWithValue(error.message || "Failed to create user");
+      if(Array.isArray(error.response.data.Errors)){
+        return thunk.rejectWithValue(error.response.data.Errors);
+      }
+      return thunk.rejectWithValue([ "Failed to create user"]);
     }
   }
 );

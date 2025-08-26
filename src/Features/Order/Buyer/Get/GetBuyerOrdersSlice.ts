@@ -24,9 +24,7 @@ const BuyerOrderSlice = createSlice({
                 state.loading = true;
                 state.errors = [];
             })
-            .addCase(BuyerOrders.fulfilled, (state, action : PayloadAction<OrderDTO[]>) => {
-                console.log(action.payload, "hhhhhhhh");
-                
+            .addCase(BuyerOrders.fulfilled, (state, action : PayloadAction<OrderDTO[]>) => {                
                 state.loading = false;
                 state.orders = action.payload;
                 state.errors = [];

@@ -92,7 +92,6 @@ export default function GetBuyerOrdersComponent() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Notification */}
         {notification && (
           <div className={`mb-6 p-4 rounded-lg ${
             notification.type === "success" 
@@ -103,13 +102,11 @@ export default function GetBuyerOrdersComponent() {
           </div>
         )}
 
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
           <p className="text-gray-600">Track your order status and manage your purchases</p>
         </div>
 
-        {/* Orders List */}
         {!ordersState.orders || ordersState.orders.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="text-gray-500 text-xl mb-4">No orders found</div>
@@ -133,7 +130,6 @@ export default function GetBuyerOrdersComponent() {
 
               return (
                 <div key={order.id} className="bg-white rounded-2xl shadow-lg p-6">
-                  {/* Order Status Banner */}
                   <div className={`mb-6 p-4 rounded-lg ${getOrderStatusColor(order.state)}`}>
                     <div className="flex items-center justify-between">
                       <div>
@@ -147,7 +143,6 @@ export default function GetBuyerOrdersComponent() {
                   </div>
 
                   <div className="flex flex-col md:flex-row gap-6">
-                    {/* Product Image */}
                     <div className="md:w-1/4">
                       <img
                         src={`http://localhost:5155/products/${productImage}`}
@@ -159,7 +154,6 @@ export default function GetBuyerOrdersComponent() {
                       />
                     </div>
 
-                    {/* Product Details */}
                     <div className="md:w-3/4">
                       <div className="mb-4">
                         <h2 className="text-xl font-semibold text-gray-900 mb-2">{productName}</h2>

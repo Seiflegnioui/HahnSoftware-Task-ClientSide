@@ -4,11 +4,13 @@ import getProductReducer from "./Show/GetProductSlice";
 import ProductDetailsReducer from "./../../Buyer/Product/ProductDetailsSlice";
 import type { SellerDTO } from "../Create/CreateSellerSlice";
 import type { Categories } from "./Enums/Caterories";
+import ReviewedProductReducer from "../../Buyer/Product/Reviewed/MarkReviewedSlice"
 
 export const productReducer = combineReducers({
   create: createProductReducer,
   get: getProductReducer,
-  details : ProductDetailsReducer
+  details : ProductDetailsReducer,
+  reviewed : ReviewedProductReducer
 });
 
 export interface ProductDTO {

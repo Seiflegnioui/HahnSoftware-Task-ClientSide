@@ -21,6 +21,9 @@ export default function UserRegistrationForm() {
         }else if(connectedUser?.role == 2){
             navigate("/buyer/create")
         }
+    }).catch(()=> {
+      console.log(userState.errors);
+      
     });
   };
 
@@ -219,11 +222,13 @@ export default function UserRegistrationForm() {
                 </div>
               </div>
 
-              {/* {userState.error && (
+              {userState.errors && userState.errors.map(err => {
+                return  (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                  <p className="text-sm">{userState.error}</p>
+                  <p className="text-sm">{err}</p>
                 </div>
-              )} */}
+              )
+              }) }
 
               <button
                 type="submit"
