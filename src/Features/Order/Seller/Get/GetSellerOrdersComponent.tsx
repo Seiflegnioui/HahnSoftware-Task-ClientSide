@@ -152,7 +152,7 @@ export default function GetSellerOrdersComponent() {
                         <p className="text-sm">Order #{order.id}</p>
                       </div>
                       <span className="text-2xl font-bold">
-                        ${(productPrice * order.quantity).toFixed(2)}
+                        MAD {(productPrice * order.quantity).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -162,8 +162,8 @@ export default function GetSellerOrdersComponent() {
                       <h4 className="font-medium text-gray-700 mb-2">Product Details</h4>
                       <p className="text-gray-900 font-semibold">{productName}</p>
                       <p className="text-gray-600">Quantity: {order.quantity}</p>
-                      <p className="text-gray-600">Unit Price: ${productPrice}</p>
-                      <p className="text-gray-600">Total: ${(productPrice * order.quantity).toFixed(2)}</p>
+                      <p className="text-gray-600">Unit Price: MAD{productPrice}</p>
+                      <p className="text-gray-600">Total: MAD{(productPrice * order.quantity).toFixed(2)}</p>
                     </div>
                     
                     <div>

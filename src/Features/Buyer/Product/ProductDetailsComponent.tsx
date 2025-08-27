@@ -5,6 +5,7 @@ import { ProductDetails } from "./ProductDetailsThunk";
 import { SendOrder } from "../../Order/Buyer/Create/SendOrderThunk";
 import type { AppDispatch, RootState } from "../../store";
 import { useAppContext } from "../../../API/AppContext";
+import { PORT } from "../../../evn";
 
 export default function ProductDetailsComponent() {
   const { id } = useParams<{ id: string }>();
@@ -125,7 +126,7 @@ export default function ProductDetailsComponent() {
           <div className="md:flex">
             <div className="md:w-1/2 p-6 flex items-center justify-center">
               <img
-                src={`http://localhost:5155/products/${product.image}`}
+                src={`http://localhost:${PORT}/products/${product.image}`}
                 alt={product.name}
                 className="w-full max-w-md h-96 object-cover rounded-xl shadow-lg"
               />
@@ -137,7 +138,7 @@ export default function ProductDetailsComponent() {
                   {product.name}
                 </h1>
                 <p className="text-2xl font-semibold text-green-700 mb-4">
-                  ${product.price}
+                  MAD {product.price}
                 </p>
                 <p className="text-gray-600 text-lg mb-6">
                   {product.description}
@@ -222,7 +223,7 @@ export default function ProductDetailsComponent() {
                   ? "Login as Buyer to Order"
                   : product.quantity === 0
                   ? "Out of Stock"
-                  : `Order Now - $${(product.price * quantity).toFixed(2)}`}
+                  : `Order Now - MAD ${(product.price * quantity).toFixed(2)}`}
               </button>
 
               {!isBuyer && connectedUser && (
@@ -244,7 +245,7 @@ export default function ProductDetailsComponent() {
               <div className="flex-shrink-0">
                 {product.seller.photo ? (
                   <img
-                    src={`http://localhost:5155/${product.seller.photo}`}
+                    src={`http://localhost:${PORT}/${product.seller.photo}`}
                     alt={product.seller.shopName || product.seller.username}
                     className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                   />

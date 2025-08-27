@@ -58,7 +58,6 @@ export const router = createBrowserRouter([
         element: <CreateBuyerComponent />,
       },
 
-      
     ],
   },
 

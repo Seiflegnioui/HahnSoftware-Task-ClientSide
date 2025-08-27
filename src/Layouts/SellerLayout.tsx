@@ -5,6 +5,7 @@ import type { AppDispatch, RootState } from "../Features/store";
 import { useDispatch, useSelector } from "react-redux";
 import { GetNotifs } from "../Features/Notification/Get/NotificationThunk";
 import type { NotificationDTO } from "../Features/Notification";
+import { PORT } from "../evn";
 
 export default function SellerLayout() {
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ export default function SellerLayout() {
             <div className="flex items-center">
               {connectedUser?.photo ? (
                 <img
-                  src={`http://localhost:5155/${connectedUser.photo}`}
+                  src={`http://localhost:${PORT}/${connectedUser.photo}`}
                   alt={connectedUser.username}
                   className="h-8 w-8 rounded-full object-cover"
                 />
@@ -205,7 +206,7 @@ export default function SellerLayout() {
                 >
                   {connectedUser?.photo ? (
                     <img
-                      src={`http://localhost:5155/${connectedUser.photo}`}
+                      src={`http://localhost:${PORT}/${connectedUser.photo}`}
                       alt={connectedUser.username}
                       className="h-8 w-8 rounded-full object-cover"
                     />

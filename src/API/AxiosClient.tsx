@@ -1,7 +1,7 @@
 import axios from "axios";
-
+import {PORT} from "../evn"
 export const axiosClient = axios.create({
-    baseURL:"http://localhost:5155/"
+    baseURL:`http://localhost:${PORT}/`
 })
 
  axiosClient.interceptors.request.use((config)=>{

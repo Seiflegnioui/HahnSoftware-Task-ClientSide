@@ -6,6 +6,7 @@ import { type AppDispatch, type RootState } from "../../store";
 import { GetProduct } from "../../Seller/Products/Show/GetProductThunk";
 import type { ProductDTO } from "../../Seller/Products";
 import { ReviewProduct } from "../Product/Reviewed/MarkReviewedThunk";
+import { PORT } from "../../../evn";
 
 export default function HomeBuyerComponent() {
   const dispatch = useDispatch<AppDispatch>();
@@ -70,7 +71,7 @@ export default function HomeBuyerComponent() {
                 >
                   <div className="relative">
                     <img
-                      src={`http://localhost:5155/products/${product.image}`}
+                      src={`http://localhost:${PORT}/products/${product.image}`}
                       alt={product.name}
                       className="w-full h-48 object-cover rounded-t-2xl"
                     />
@@ -89,7 +90,7 @@ export default function HomeBuyerComponent() {
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                      <span className="text-green-600 font-bold">${product.price}</span>
+                      <span className="text-green-600 font-bold">MAD {product.price}</span>
                     </div>
                     
                     <p className="text-gray-600 text-sm mb-3">
@@ -161,7 +162,7 @@ export default function HomeBuyerComponent() {
                   <div className="flex items-center mb-3">
                     {seller.photo ? (
                       <img
-                        src={`http://localhost:5155/${seller.photo}`}
+                        src={`http://localhost:${PORT}/${seller.photo}`}
                         alt={seller.name}
                         className="w-12 h-12 rounded-full object-cover mr-3"
                       />

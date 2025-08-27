@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../store";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { OrderDTO, OrderState } from "../..";
+import { PORT } from "../../../../evn";
 
 export default function GetBuyerOrdersComponent() {
   const { connectedSellerOrBuyer } = useAppContext();
@@ -137,7 +138,7 @@ export default function GetBuyerOrdersComponent() {
                         <p className="text-sm">{getStatusMessage(order.state)}</p>
                       </div>
                       <span className="text-2xl font-bold">
-                        ${(productPrice * order.quantity).toFixed(2)}
+                        MAD {(productPrice * order.quantity).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -145,7 +146,7 @@ export default function GetBuyerOrdersComponent() {
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="md:w-1/4">
                       <img
-                        src={`http://localhost:5155/products/${productImage}`}
+                        src={`http://localhost:${PORT}/products/${productImage}`}
                         alt={productName}
                         className="w-full h-48 object-cover rounded-xl shadow-md"
                         onError={(e) => {
@@ -164,8 +165,8 @@ export default function GetBuyerOrdersComponent() {
                         <div>
                           <h4 className="font-medium text-gray-700 mb-2">Order Details</h4>
                           <p className="text-gray-600">Quantity: {order.quantity}</p>
-                          <p className="text-gray-600">Unit Price: ${productPrice}</p>
-                          <p className="text-gray-600">Total: ${(productPrice * order.quantity).toFixed(2)}</p>
+                          <p className="text-gray-600">Unit Price: MAD {productPrice}</p>
+                          <p className="text-gray-600">Total: MAD {(productPrice * order.quantity).toFixed(2)}</p>
                         </div>
                         
                         <div>

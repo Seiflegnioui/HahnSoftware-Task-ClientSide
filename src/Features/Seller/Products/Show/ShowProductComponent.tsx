@@ -6,6 +6,7 @@ import { DeleteProduct, GetProduct } from "./GetProductThunk";
 import { useAppContext } from "../../../../API/AppContext";
 import type { ProductDTO } from "..";
 import { Categories } from "../Enums/Caterories";
+import { PORT } from "../../../../evn";
 
 export default function ShowProductComponent() {
   const { connectedSellerOrBuyer } = useAppContext();
@@ -206,7 +207,7 @@ export default function ShowProductComponent() {
             >
               <div className="relative">
                 <img
-                  src={`http://localhost:5155/products/${product.image}`}
+                  src={`http://localhost:${PORT}/products/${product.image}`}
                   alt={product.name}
                   className="w-full h-48 object-cover"
                 />
@@ -222,7 +223,7 @@ export default function ShowProductComponent() {
                   {product.name}
                 </h3>
                 <p className="text-green-700 font-bold text-xl mb-2">
-                  ${product.price}
+                  MAD {product.price}
                 </p>
 
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2">
@@ -248,7 +249,7 @@ export default function ShowProductComponent() {
                   <div className="flex-shrink-0">
                     {product.seller?.photo ? (
                       <img
-                        src={`http://localhost:5155/${product.seller.photo}`}
+                        src={`http://localhost:${PORT}/${product.seller.photo}`}
                         alt={product.seller.username}
                         className="h-8 w-8 rounded-full object-cover"
                       />

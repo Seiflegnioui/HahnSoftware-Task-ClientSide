@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../../../API/AppContext';
 import type { SellerDTO } from '../Create/CreateSellerSlice';
 import type { UserDTO } from '../../User/UserSlice';
+import { PORT } from '../../../evn';
 
 export default function SellerProfileComponent() {
     const { connectedSellerOrBuyer, connectedUser } = useAppContext();
@@ -54,7 +55,7 @@ export default function SellerProfileComponent() {
                     <div className="flex items-center space-x-10">
                         <div className="relative">
                             <img
-                                src={`http://localhost:5155/shoplogos/${seller.shopLogo || 'default-shop.png'}`}
+                                src={`http://localhost:${PORT}/shoplogos/${seller.shopLogo || 'default-shop.png'}`}
                                 alt={seller.shopName}
                                 className="w-40 h-40 rounded-full object-cover border-6 border-white shadow-lg"
                             />
@@ -148,7 +149,7 @@ export default function SellerProfileComponent() {
                                 
                                 <div className="flex items-center space-x-6 mb-6">
                                     <img
-                                        src={`http://localhost:5155/${user.photo || 'default-user.png'}`}
+                                        src={`http://localhost:${PORT}/${user.photo || 'default-user.png'}`}
                                         alt={user.username}
                                         className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
                                     />
