@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import GuestLayout from "../Layouts/GuestLayout";
 import UserComponent from "../Features/User/UserComponent";
 import Home from "../Components/Home";
@@ -20,6 +20,10 @@ import SellerProfileComponent from "../Features/Seller/Profile/SellerProfileComp
 import NotificationsPage from "../Features/Notification/Get/NotificationPage";
 
 export const router = createBrowserRouter([
+    {
+    path: "/",
+    element: <Navigate to="/guest/home" replace />,
+  },
   {
     path: "guest",
     element: <GuestLayout />,

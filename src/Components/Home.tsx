@@ -24,7 +24,7 @@ export default function Home() {
                 href="/seller/create"
                 className="px-8 py-4 bg-green-600 text-white font-medium rounded-lg shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition transform hover:-translate-y-1"
               >
-                Start Selling Today
+                Start Today
               </a>
               <a
                 href="/buyer/home"
